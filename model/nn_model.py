@@ -144,8 +144,6 @@ with tf.Session() as sess:
     print(result)
 
     """
-def test cui leo ():
-    test 123
 
 
 
