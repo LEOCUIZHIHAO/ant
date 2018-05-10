@@ -1,1 +1,1 @@
-# ant_competition
+# ant
