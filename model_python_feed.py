@@ -131,7 +131,6 @@ end_time = time.time()
 
 print("process %f percent data using %f time: " % (bagging_fraction,(end_time - start_time)))
 
-
-def test():
-    print(test git)
+def duck():
+    print(quack)
 
