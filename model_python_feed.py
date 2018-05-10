@@ -130,3 +130,8 @@ for iter_batch in range(0, batch_size):
 end_time = time.time()
 
 print("process %f percent data using %f time: " % (bagging_fraction,(end_time - start_time)))
+
+
+def test():
+    print(test git)
+
