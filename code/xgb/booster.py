@@ -119,7 +119,7 @@ def predict_and_save_model(bst, dtest, model_path, fmap, eta):
 
     features = pd.Series(bst.get_fscore(fmap = fmap)).sort_values(ascending=False)
     #save features and prepare feed into NN
-    features.to_csv(model_path + "xgb_features_{}.csv".format(eta))
+    features.to_csv(score_path + "xgb_features_{}.csv".format(eta))
 
     print("saving model & features ......")
 
