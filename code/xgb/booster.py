@@ -16,7 +16,8 @@ os.environ['PATH'] = os.environ['PATH'] + ';C:\\Program Files\\mingw-w64\\x86_64
 #*******************************hParams ***************************************#
 
 param = {
-
+        
+        "objective" : "binary:logistic",
         "max_depth" : 10,
         "subsample" : 0.8,
         "colsample_bytree" : 0.9,
