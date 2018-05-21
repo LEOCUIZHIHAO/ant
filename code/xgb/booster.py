@@ -22,8 +22,9 @@ param = {
         "colsample_bytree" : 0.9,
         "min_child_weight" : 1,
         "gamma" : 0,
-        "eta" : 0.01, #learning_rate
-        "eval_metric" : ['auc', 'logloss', 'error'] #early stop only effects on error
+        "eta" : 0.1, #learning_rate
+        "eval_metric" : ['auc', 'logloss', 'error'], #early stop only effects on error
+        "silent" : 0
         #'eval_metric':'error'
         #'eval_metric': 'auc'
         #'eval_metric': 'logloss'
@@ -42,8 +43,8 @@ suffix = "21_5_2018" #signle training save file name's suffix
 
 
 loop_function = True #if False shut down loop_function
-loop_param = "min_child_weight" #change the loop parameter here
-loop_start = 6 #start loop digit
+loop_param = "max_depth" #change the loop parameter here
+loop_start = 3 #start loop digit
 loop_end = 10  #end loop digit
 loop_step = 1  #loop stop
 
