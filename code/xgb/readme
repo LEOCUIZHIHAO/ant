@@ -1,3 +1,26 @@
 How to use booster:
 
-1. 
+1. If want to use the loop function :   
+   change the loop_function = True
+   
+2. loop_param is what feature you want to loop
+   change loop_start, loop_end and loop_step
+   
+   etc:
+   loop_param = "min_child_weight" #change the loop parameter here
+   loop_start = 6 #start loop digit
+   loop_end = 10  #end loop digit
+   loop_step = 1  #loop stop
+   
+3. change the path and add answer_sheet.cdv &xgb.fmap
+
+
+If want to use the non-loop function:
+
+
+1. change the param and turn loop_fucntion == False
+
+2. Adding suffix to make the save file name unique
+
+   
+   
