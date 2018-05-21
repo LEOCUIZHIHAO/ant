@@ -211,7 +211,7 @@ def save_score(preds, param_name):
 
 def loop_function_run():
 
-    range = np.arange(loop_start, loop_end + 1, loop_step)
+    range = np.arange(loop_start, loop_end, loop_step)
 
     for loop_param_value in range:
 
