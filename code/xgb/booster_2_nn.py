@@ -10,6 +10,10 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import csv
+from lib.one_hot_encoder import *
+from leaf_node_index import *
+#from one_hot_encoder import *
+#from leaf_node_index import *
 os.environ['PATH'] = os.environ['PATH'] + ';C:\\Program Files\\mingw-w64\\x86_64-5.3.0-posix-seh-rt_v4-rev0\\mingw64\\bin'
 
 #for i in range (65, 100, 4):
@@ -35,7 +39,7 @@ param = {
 num_round = 550
 early_stopping_rounds = 10
 offset = 150000 #validation
-suffix = "md_550" #signle training save file name's suffix
+suffix = "test" #signle training save file name's suffix
 
 #*******************************************************************************#
 #********************************Loop param*************************************#
@@ -108,11 +112,14 @@ def load_data():
     train = train_data[:-offset,1:]
     label = train_data[:-offset,0]
 
+    #one_hot label
+    label_oh = one_hot_encode(label)
+
     #Define validation set
     validation = train_data[-offset:,1:]
     validation_label = train_data[-offset:,0]
 
-    return train, test, label, validation, validation_label
+    return train, test, label, validation, validation_label, label_oh
 
 def create_DMatrix(param, train, test, label, validation, validation_label):
 
@@ -128,7 +135,9 @@ def create_DMatrix(param, train, test, label, validation, validation_label):
 
     bst = xgb.train(param, dtrain, num_round, watchlist, evals_result=evals_result, early_stopping_rounds =  early_stopping_rounds)
 
-    return bst, dtest, evals_result
+    _total_leaf_index, leaf = get_leaf_node_index(bst, dtrain)
+
+    return bst, dtest, evals_result, _total_leaf_index, leaf
 #computitional cost too much
 #eval = xgb.cv(param, dtrain, num_round, nfold=6, metrics={'error'}, seed=0,  callbacks=[xgb.callback.print_evaluation(show_stdv=False),xgb.callback.early_stop(3)])
 
@@ -138,6 +147,8 @@ def predict_and_save_model(bst, dtest, param_name):
     #save xgboost structure
     bst.dump_model(score_path + "xbg_{}.txt".format(param_name))
 
+    print("staring generate leaf nodes index")
+
     preds = bst.predict(dtest, ntree_limit= bst.best_iteration)
     print("\nthe minimal loss found in : %i booster \n" %(bst.best_iteration))
 
@@ -145,9 +156,9 @@ def predict_and_save_model(bst, dtest, param_name):
     #preds = bst.predict(dtest, pred_leaf=True)
     #print(preds)
 
-    #features = pd.Series(bst.get_fscore(fmap = fmap)).sort_values(ascending=False)
+    features = pd.Series(bst.get_fscore(fmap = fmap)).sort_values(ascending=False)
     #save features and prepare feed into NN
-    #features.to_csv(score_path + "xgb_features_{}.csv".format(param_name))
+    features.to_csv(score_path + "xgb_features_{}.csv".format(param_name))
 
     print("saving model & features ......\n")
 
@@ -223,7 +234,7 @@ def loop_function_run():
 
         _param, _param_name = save_name_and_loop_param(loop_param_value)
         save_hParams(_param, _param_name)
-        train, test, label, validation, validation_label = load_data()
+        train, test, label, validation, validation_label, label_oh = load_data()
         bst, dtest, evals_result = create_DMatrix(_param, train, test, label, validation, validation_label)
         preds = predict_and_save_model(bst, dtest, _param_name)
         save_figure(_param_name, evals_result)
@@ -243,11 +254,13 @@ def main():
 
         print("XGBoost starting with lr : %s" %(param["eta"]))
         save_hParams(param, suffix)
-        train, test, label, validation, validation_label = load_data()
-        bst, dtest, evals_result = create_DMatrix(param, train, test, label, validation, validation_label)
-        preds = predict_and_save_model(bst, dtest, suffix)
-        save_figure(suffix, evals_result)
-        save_score(preds, suffix)
+        train, test, label, validation, validation_label, label_oh = load_data()
+        bst, dtest, evals_result, _total_leaf_index, leaf = create_DMatrix(param, train, test, label, validation, validation_label)
+        feed_nn_data = xgb_2_nn_data(_total_leaf_index, leaf, label_oh)
+        np.save(score_path + "xgb_nn.npy", feed_nn_data)
+        #preds = predict_and_save_model(bst, dtest, suffix)
+        #save_figure(suffix, evals_result)
+        #save_score(preds, suffix)
 
 if __name__ == '__main__':
     main()
