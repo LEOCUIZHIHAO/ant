@@ -11,35 +11,29 @@ def stack_split(features,labels,number_of_model):
     feature_split = {}
     label_split = {}
 
-    end_row = fold_size - 1
     for i in range(number_of_model):
         # define starting and end rows of the fold data
-        if i != number_of_model -1:
-            if i == 0:
-                start_row = 0
-            else:
-                start_row = end_row + 1
-                end_row = start_row + fold_size - 1
+        start_row = fold_size * i
+        end_row = fold_size * (i+1)
+
+        if i == number_of_model - 1:
+
             print("\nfold_{}".format(i+1) + " starting between row:{}".format(start_row) + " and row:{}".format(end_row))
-            print(fold_size)
-            # Store extrated fold data from feature
-            fold_split["fold_{}".format(i+1)] = features[start_row:end_row,:]
-            # Delete the extrated data from feature and label data
-            feature_split["feature_{}".format(i+1)] = np.delete(features, np.s_[start_row:(start_row + fold_size)], axis = 0)
-            label_split["label_{}".format(i+1)] = np.delete(labels, np.s_[start_row:(start_row + fold_size)], axis = 0)
-        else:
-            start_row = end_row + 1
-            row = start_row
-            print("\nfold_{}".format(i+1) + " starting between row:{}".format(start_row))
-            # Store extrated fold data from feature
             fold_split["fold_{}".format(i+1)] = features[start_row:,:]
             # Delete the extrated data from feature and label data
             feature_split["feature_{}".format(i+1)] = np.delete(features, np.s_[start_row:], axis = 0)
             label_split["label_{}".format(i+1)] = np.delete(labels, np.s_[start_row:], axis = 0)
 
+        else:
+
+            print("\nfold_{}".format(i+1) + " starting between row:{}".format(start_row) + " and row:{}".format(end_row))
+            # Store extrated fold data from feature
+            fold_split["fold_{}".format(i+1)] = features[start_row:end_row,:]
+            # Delete the extrated data from feature and label data
+            feature_split["feature_{}".format(i+1)] = np.delete(features, np.s_[start_row:(start_row + fold_size)], axis = 0)
+            label_split["label_{}".format(i+1)] = np.delete(labels, np.s_[start_row:(start_row + fold_size)], axis = 0)
+
     print("\nEnd of split, acess via ['fold_number'], ['feature_number'] and ['label_number']")
-    print(len(fold_split["fold_5"]) + row)
-    exit()
     return fold_split, feature_split, label_split
 
 def stack_logistic(features,labels):
