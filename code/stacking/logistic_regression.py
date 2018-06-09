@@ -1,4 +1,5 @@
 from sklearn.linear_model import LogisticRegression
+from sklearn.externals import joblib
 import numpy as np
 import pandas as pd
 import math
@@ -49,6 +50,7 @@ def stack_logistic(features,labels,test_feature):
         print("test score predicted")
         test_score.append(test_prediction[:,1].tolist())
         fold_score += stack_score[:,1].tolist()
+        joblib.dump(logistic, "../../save_restore/LR_layer_1_model_{}".format(i+1))
         print("LR model numer:{}".format(i+1) + " complete")
         # print(scores)
     return fold_score, test_score
