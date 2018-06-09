@@ -76,7 +76,7 @@ def stack_split(features,labels,number_of_model):
     return fold_split, feature_split, label_split
 
 
-def save_layer_score(avg_test_layer1_preds, final_fold_preds, stack_train_path, stack_test_path):
+def save_layer_score(avg_test_layer1_preds, final_fold_preds, stack_train_path, stack_test_path, score_path):
 
     stack_test_layer1_preds = np.stack(avg_test_layer1_preds, 1)
     #averaging stacked data
