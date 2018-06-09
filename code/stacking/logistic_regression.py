@@ -1,5 +1,6 @@
 from sklearn.linear_model import LogisticRegression
 from sklearn.externals import joblib
+from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import pandas as pd
 import math
@@ -34,6 +35,27 @@ def stack_split(features,labels,number_of_model):
     print("\nEnd of split, acess via ['fold_number'], ['feature_number'] and ['label_number']")
     return fold_split, feature_split, label_split
 
+def stack_random_forest(features,labels,test_feature):
+    fold_split, feature_split, label_split = stack_split(features,labels,5)
+    fold_score = []
+    test_score = []
+    print("Initiate stack random forest")
+    for i in range(len(fold_split)):
+        print("\nProcessing random forest model number:{}".format(i+1))
+        random_forest = RandomForestClassifier(n_estimators = 200, max_depth = 3)
+        random_forest.fit(feature_split["feature_{}".format(i+1)], label_split["label_{}".format(i+1)])
+        print("Training complete")
+        stack_score = random_forest.predict_proba(fold_split["fold_{}".format(i+1)])
+        print("fold score predicted")
+        test_prediction = random_forest.predict_proba(test_feature)
+        print("test score predicted")
+        test_score.append(test_prediction[:,1].tolist())
+        fold_score += stack_score[:,1].tolist()
+        joblib.dump(random_forest, "../../save_restore/RF_layer_1_model_{}.pkl".format(i+1))
+        print("RF model nubmer:{}".format(i+1) + " complete")
+        # print(scores)
+    return fold_score, test_score
+
 def stack_logistic(features,labels,test_feature):
     fold_split, feature_split, label_split = stack_split(features,labels,5)
     fold_score = []
@@ -50,8 +72,8 @@ def stack_logistic(features,labels,test_feature):
         print("test score predicted")
         test_score.append(test_prediction[:,1].tolist())
         fold_score += stack_score[:,1].tolist()
-        joblib.dump(logistic, "../../save_restore/LR_layer_1_model_{}".format(i+1))
-        print("LR model numer:{}".format(i+1) + " complete")
+        joblib.dump(logistic, "../../save_restore/LR_layer_1_model_{}.pkl".format(i+1))
+        print("LR model number:{}".format(i+1) + " complete")
         # print(scores)
     return fold_score, test_score
 
@@ -86,13 +108,14 @@ def main():
     score_path = "../../data/"
     stack_test_path = score_path + "answer_sheet.csv"
     stack_train_path = score_path + "stack_sheet.csv"
-    train = np.load("../../data/train.npy")
+    train = np.load("../../data/validation_data.npy")
     print("train data loaded")
-    test = np.load("../../data/test_a.npy")
+    test = np.load("../../data/unlabel.npy")
+    test = test[:,1:]
     print("test data loaded")
     train_feature = train[:,1:]
     train_label = train[:,0]
-    scores, test_score = stack_logistic(train_feature,train_label,test)
+    scores, test_score = stack_random_forest(train_feature,train_label,test)
     save_layer_score(test_score, scores, stack_train_path, stack_test_path, score_path)
     print("Program complete")
     # print(len(fold))
