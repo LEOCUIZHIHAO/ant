@@ -73,19 +73,24 @@ avg_test_layer1_preds = []
 #           2. Standardization,
 #           3. Normalizaiton
 # ##########################################################
-def feature_processing(features,test_feature):
-    #print("Start imputating data")
-    #Imputation
-    #imp = Imputer(missing_values='NaN', strategy='most_frequent', axis=0)
-    #imp.fit(features)
-    #features = imp.transform(features)
-    #test_feature = imp.transform(test_feature)
-    #Standardization
-    print("Start preprocessing Standardization")
-    scaler = StandardScaler()
-    scaler.fit(features)
-    features = scaler.transform(features)
-    test_feature = scaler.transform(test_feature)
+def feature_processing(names,preprocessors,features,test_feature):
+    for name, preprocessor in zip(names,preprocessors):
+        print("Start {}".format(name))
+        preprocessor.fit(features)
+        features = preprocessor.transform(features)
+        test_feature = preprocessor.transform(test_feature)
+        
+    # Imputation
+    # imp = Imputer(missing_values='NaN', strategy='most_frequent', axis=0)
+    # imp.fit(features)
+    # features = imp.transform(features)
+    # test_feature = imp.transform(test_feature)
+    # # Standardization
+    # print("Start preprocessing Standardization")
+    # scaler = StandardScaler()
+    # scaler.fit(features)
+    # features = scaler.transform(features)
+    # test_feature = scaler.transform(test_feature)
     #Normalizaiton L2,L1 norm
     #print("Start preprocessing L2 norm")
     #normalizer = Normalizer(norm='l2')
@@ -476,6 +481,9 @@ def stack_layer_1(names, classifiers, feature, labels, test_feature):
                 fold_score += stack_score[:,1].tolist()
                 print("model {}".format(name) + " complete")
             save_layer_score(fold_score, test_score, stack_train_path, stack_test_path, name)
+
+
+
 
 
 def main():
