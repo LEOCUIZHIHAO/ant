@@ -451,6 +451,33 @@ def stack_logistic_layer2(features,labels,test_feature):
     return fold_score, test_score
 
 
+names = ["Random Forest", "Logistic Regression", "Multi Layer Perceptron"]
+
+classifier = [
+    RandomForestClassifier(n_estimators = 450, max_depth = 4, criterion='entropy'),
+    LogisticRegression(class_weight = "balanced"),
+    MLPClassifier(hidden_layer_sizes=(256,128,128), activation = "logistic", batch_size = 20000)
+]
+
+def stack_layer_1(names, classifiers, feature, labels, test_feature):
+        fold_split, feature_split, label_split = stack_split(features,labels,5)
+        fold_score = []
+        test_score = []
+        for name, clf in zip(names, classifiers):
+            for i in range(len(fold_split)):
+                print("\nProcessing model :{}".format(name))
+                clf.fit(feature_split["feature_{}".format(i+1)], label_split["label_{}".format(i+1)])
+                print("Training complete")
+                stack_score = clf.predict_proba(fold_split["fold_{}".format(i+1)])
+                print("fold score predicted")
+                test_prediction = clf.predict_proba(test_feature)
+                print("test score predicted")
+                test_score.append(test_prediction[:,1].tolist())
+                fold_score += stack_score[:,1].tolist()
+                print("model {}".format(name) + " complete")
+            save_layer_score(fold_score, test_score, stack_train_path, stack_test_path, name)
+
+
 def main():
 
     train_data = np.load(train_path)
