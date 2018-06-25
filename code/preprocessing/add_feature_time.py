@@ -23,5 +23,4 @@ def main():
     test_data_new_feature = convert_to_date(test_data["date"])
     test_data['f298'] = test_data_new_feature
     test_data.to_csv(new_test_save_path)
-
 main()
